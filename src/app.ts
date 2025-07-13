@@ -9,6 +9,9 @@ dotenv.config();
 //assign express backend
 const app = express();
 
+//convert fr req to json to identify
+app.use(express.json());
+
 const PORT = process.env.SERVER_PORT;
 
 ConnectDb().then(() => {
