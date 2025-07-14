@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
+import { CounterModel } from "./counter";
 
 type Reader = {
+  id: string,  
   name: string;
   email: string;
   phone: number;
@@ -12,6 +14,10 @@ type Reader = {
 
 const reader = new mongoose.Schema<Reader>(
   {
+    id: {
+      type: String,
+      unique: true,
+    },
     name: {
       type: String,
       required: [true, "Name is required"],
@@ -61,6 +67,30 @@ const reader = new mongoose.Schema<Reader>(
     timestamps: true, // createdAt and updatedAt
   }
 );
+
+reader.pre("save", async function (next) {
+  if (this.isNew) {
+    const counter = await CounterModel.findOneAndUpdate(
+      { model: "Reader" },
+      { $inc: { count: 1 } },
+      { upsert: true, new: true}
+    );
+    const formattedId = `R${String(counter.count).padStart(3, "0")}`;
+    this.id = formattedId;
+  }
+  next();
+});
+
+
+
+reader.set("toJSON", {
+  transform: (_doc, ret :any ) => {
+    delete ret._id;
+    delete ret.__v;
+  },
+});
+
+
 
 const ReaderModel = mongoose.model("Reader", reader);
 
