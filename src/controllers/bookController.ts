@@ -2,6 +2,10 @@ import { NextFunction, Response, Request } from "express";
 import BookModel from "../models/book";
 import { ApiError } from "../errors/apiError";
 
+
+
+
+//create book 
 export const createBook = async (
   req: Request,
   res: Response,
@@ -30,6 +34,10 @@ export const createBook = async (
   }
 };
 
+
+
+//get all books 
+
 export const getAllBooks = async (
   req: Request,
   res: Response,
@@ -42,6 +50,10 @@ export const getAllBooks = async (
     next(error);
   }
 };
+
+
+
+// update book 
 
 export const updateBook = async (
   req: Request,
@@ -69,6 +81,11 @@ export const updateBook = async (
   }
 };
 
+
+
+// get one book  
+
+
 export const getOneBook = async (
   req: Request,
   res: Response,
@@ -85,6 +102,10 @@ export const getOneBook = async (
     next(error);
   }
 };
+
+
+
+// delete book 
 
 export const deleteBook = async (
   req: Request,
