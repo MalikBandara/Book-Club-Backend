@@ -6,6 +6,7 @@ import {
   getOneBook,
   updateBook,
 } from "../controllers/bookController";
+import { returnBook } from "../controllers/issueBookController";
 
 
 const BookRouter = express.Router();
@@ -19,5 +20,7 @@ BookRouter.put("/:id", updateBook);
 BookRouter.get("/:id", getOneBook);
 
 BookRouter.delete("/:id" , deleteBook)
+
+
 
 export default BookRouter;

@@ -1,11 +1,10 @@
-import express from "express"
-import { IssueBook } from "../controllers/issueBookController"
+import express from "express";
+import { IssueBook, returnBook } from "../controllers/issueBookController";
 
+const IssueBookRouter = express.Router();
 
-const IssueBookRouter = express.Router()
+IssueBookRouter.post("/", IssueBook);
 
-IssueBookRouter.post("/" , IssueBook)
+IssueBookRouter.post("/return/:id", returnBook);
 
-
-
-export default IssueBookRouter
+export default IssueBookRouter;

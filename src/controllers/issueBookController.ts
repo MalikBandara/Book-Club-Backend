@@ -2,6 +2,7 @@ import IssueBookModel from "../models/issueBook";
 import BookModel from "../models/book";
 import ReaderModel from "../models/reader";
 import { Request, Response, NextFunction } from "express";
+import { ApiError } from "../errors/apiError";
 
 export const IssueBook = async (
   req: Request,
@@ -20,7 +21,7 @@ export const IssueBook = async (
       return res.status(400).json({ message: "Book already borrowed" });
     }
 
-    // Find Reader by `id: 5`
+    // Find Reader by
     const foundReader = await ReaderModel.findOne({ id: String(reader) });
     if (!foundReader) {
       return res.status(404).json({ message: "Reader not found" });
@@ -45,5 +46,33 @@ export const IssueBook = async (
     });
   } catch (err) {
     next(err);
+  }
+};
+
+export const returnBook = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+
+    const returnToBeBook = await BookModel.findOne({ id });
+
+    if (!returnToBeBook) {
+      throw new ApiError(404, "Book not found to return ");
+    }
+
+    if (returnToBeBook.status === "Available") {
+      return res.status(400).json({ message: "Book already Returned" });
+    }
+
+    returnToBeBook.status = "Available";
+    await returnToBeBook.save();
+    return res
+      .status(200)
+      .json({ message: "book return successfully", returnToBeBook });
+  } catch (error) {
+    next(error);
   }
 };
