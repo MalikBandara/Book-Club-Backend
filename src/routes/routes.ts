@@ -1,15 +1,14 @@
+import express from "express";
+import ReaderRouter from "./reader.routes";
+import BookRouter from "./book.routes";
+import IssueBookRouter from "./issueBook.routes";
+import UserRouter from "./auth.routes";
 
-import express from 'express'
-import ReaderRouter from './reader.routes'
-import BookRouter from './book.routes'
-import IssueBookRouter from './issueBook.routes'
+const rootRouter = express.Router();
 
+rootRouter.use("/reader", ReaderRouter);
+rootRouter.use("/book", BookRouter);
+rootRouter.use("/issueBook", IssueBookRouter);
+rootRouter.use("/auth", UserRouter);
 
-
-const rootRouter = express.Router()
-
-rootRouter.use("/reader" , ReaderRouter)
-rootRouter.use("/book" , BookRouter)
-rootRouter.use("/issueBook", IssueBookRouter)
-
-export default rootRouter
+export default rootRouter;

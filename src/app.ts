@@ -5,19 +5,24 @@ import dotenv from "dotenv";
 import { ConnectDb } from "./db/db";
 import ReaderRouter from "./routes/reader.routes";
 import rootRouter from "./routes/routes";
+import cookieParser from "cookie-parser";
 import { ErrorHandler } from "./middleware/errorHandeler";
+import cors from "cors";
 
 //config the dotenv file
 dotenv.config();
 //assign express backend
 const app = express();
 
+app.use(cors());
+
 //convert fr req to json to identify
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api", rootRouter);
 
-app.use(ErrorHandler)
+app.use(ErrorHandler);
 
 const PORT = process.env.SERVER_PORT;
 

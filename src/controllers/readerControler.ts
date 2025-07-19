@@ -12,7 +12,7 @@ export const createReader = async (
   try {
     const reader = new ReaderModel(req.body);
     await reader.save();
-    resp.status(201).json(reader);
+    resp.status(201).json({ message: "Reader Created Successfully !" });
   } catch (error: any) {
     next(error);
   }
@@ -26,6 +26,10 @@ export const getReaders = async (
 ) => {
   try {
     const reader = await ReaderModel.find();
+
+    if (!reader || reader.length === 0) {
+      throw new ApiError(404, "No Readers found !!!");
+    }
     res.status(200).json(reader);
   } catch (error: any) {
     next(error);

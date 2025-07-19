@@ -2,10 +2,7 @@ import { NextFunction, Response, Request } from "express";
 import BookModel from "../models/book";
 import { ApiError } from "../errors/apiError";
 
-
-
-
-//create book 
+//create book
 export const createBook = async (
   req: Request,
   res: Response,
@@ -23,7 +20,7 @@ export const createBook = async (
     const book = new BookModel(req.body);
     await book.save();
 
-    res.status(201).json({ message: "New Book added Successfully", book });
+    res.status(201).json({ message: "New Book added Successfully" });
   } catch (error: any) {
     // Handle duplicate key error thrown by MongoDB
     if (error.code === 11000 && error.keyPattern?.isbn) {
@@ -34,9 +31,7 @@ export const createBook = async (
   }
 };
 
-
-
-//get all books 
+//get all books
 
 export const getAllBooks = async (
   req: Request,
@@ -45,15 +40,18 @@ export const getAllBooks = async (
 ) => {
   try {
     const books = await BookModel.find();
+
+    if (!books || books.length === 0) {
+      throw new ApiError(404, "No Books found !!!");
+    }
     res.status(200).json(books);
   } catch (error) {
     next(error);
   }
 };
+// update book
 
-
-
-// update book 
+// why use findOneAndUpdate mokada specifically id generate krpu nisa
 
 export const updateBook = async (
   req: Request,
@@ -75,16 +73,13 @@ export const updateBook = async (
     if (!updatedBook) {
       throw new ApiError(404, "Book not found");
     }
-    res.status(200).json(updatedBook);
+    res.status(200).json({ message: "Book Update Successfully !" });
   } catch (error) {
     next(error);
   }
 };
 
-
-
-// get one book  
-
+// get one book
 
 export const getOneBook = async (
   req: Request,
@@ -103,9 +98,7 @@ export const getOneBook = async (
   }
 };
 
-
-
-// delete book 
+// delete book
 
 export const deleteBook = async (
   req: Request,
@@ -121,9 +114,7 @@ export const deleteBook = async (
       id: String(req.params.id),
     });
 
-    res
-      .status(200)
-      .json({ message: "Book successfully deleted ", deletedBook });
+    res.status(200).json({ message: "Book successfully deleted " });
   } catch (error) {
     next(error);
   }

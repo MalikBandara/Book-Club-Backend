@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 import { CounterModel } from "./counter";
 
 type Reader = {
-  id: string,  
+  id: string;
   name: string;
   email: string;
-  phone: number;
+  phone: string;
   address: string;
   isActive: boolean;
   memberShipId: string;
@@ -36,12 +36,13 @@ const reader = new mongoose.Schema<Reader>(
       ],
     },
     phone: {
-      type: Number,
+      type: String,
       required: [true, "Phone number is required"],
       validate: {
-        validator: (v: number) => v.toString().length >= 10,
-        message: "Phone number must be at least 10 digits",
+        validator: (v: string) => /^\d{10}$/.test(v),
+        message: "Phone number must be exactly 10 digits",
       },
+      trim: true,
     },
     address: {
       type: String,
@@ -73,7 +74,7 @@ reader.pre("save", async function (next) {
     const counter = await CounterModel.findOneAndUpdate(
       { model: "Reader" },
       { $inc: { count: 1 } },
-      { upsert: true, new: true}
+      { upsert: true, new: true }
     );
     const formattedId = `R${String(counter.count).padStart(3, "0")}`;
     this.id = formattedId;
@@ -81,16 +82,12 @@ reader.pre("save", async function (next) {
   next();
 });
 
-
-
 reader.set("toJSON", {
-  transform: (_doc, ret :any ) => {
+  transform: (_doc, ret: any) => {
     delete ret._id;
     delete ret.__v;
   },
 });
-
-
 
 const ReaderModel = mongoose.model("Reader", reader);
 

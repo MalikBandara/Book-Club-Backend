@@ -19,19 +19,19 @@ const book = new mongoose.Schema<Book>(
       unique: true,
     },
 
-    // generate isbn automatically 
-    // isbn: {
-    //   type: String,
-    //   unique: true,
-    //   required: true,
-    //   match: [/^\d{10}(\d{3})?$/, "Invalid ISBN format"],
-    //   default: () => {
-    //     const randomDigits = Array.from({ length: 10 }, () =>
-    //       Math.floor(Math.random() * 10)
-    //     ).join("");
-    //     return `978${randomDigits}`;
-    //   },
-    // },
+    // generate isbn automatically
+    isbn: {
+      type: String,
+      unique: true,
+      required: true,
+      match: [/^\d{10}(\d{3})?$/, "Invalid ISBN format"],
+      default: () => {
+        const randomDigits = Array.from({ length: 10 }, () =>
+          Math.floor(Math.random() * 10)
+        ).join("");
+        return `978${randomDigits}`;
+      },
+    },
     title: {
       type: String,
       required: [true, "Title is required"],
@@ -65,9 +65,7 @@ const book = new mongoose.Schema<Book>(
   { timestamps: true }
 );
 
-
-
-// generate id automatically 
+// generate id automatically
 book.pre("save", async function (next) {
   if (this.isNew) {
     const counter = await CounterModel.findOneAndUpdate(
