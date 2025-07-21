@@ -9,7 +9,7 @@ import jwt, {
 } from "jsonwebtoken";
 
 // Constants for token expiration
-const ACCESS_TOKEN_EXPIRATION = "15m";
+const ACCESS_TOKEN_EXPIRATION = "30m";
 const REFRESH_TOKEN_EXPIRATION = "7d";
 
 // Helper to create Access Token
@@ -46,8 +46,8 @@ export const signup = async (
     const user = new User({ name, email, password: hashedPassword });
     await user.save();
 
-    const userResponse = { _id: user._id, name: user.name, email: user.email };
-    res.status(201).json(userResponse);
+    const userResponse = { id: user.id, name: user.name, email: user.email };
+    res.status(201).json({ message: "User Created Successfully !" });
   } catch (err) {
     next(err);
   }

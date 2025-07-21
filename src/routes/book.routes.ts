@@ -7,9 +7,12 @@ import {
   updateBook,
 } from "../controllers/bookController";
 import { returnBook } from "../controllers/issueBookController";
+import { authenticateToken } from "../middleware/authenticateToken";
 
 
 const BookRouter = express.Router();
+
+BookRouter.use(authenticateToken)
 
 BookRouter.post("/", createBook);
 

@@ -10,7 +10,15 @@ export const IssueBook = async (
   next: NextFunction
 ) => {
   try {
-    const { book, reader, dueDate } = req.body;
+    const { book, reader, bookTitle, readerName, dueDate, status } = req.body;
+
+    // const currentDate = new Date();
+    // const parsedDueDate = new Date(dueDate);
+    // if (parsedDueDate <= currentDate) {
+    //   return res.status(400).json({
+    //     message: "Due date must be after the issue (current) date",
+    //   });
+    // }
 
     //  Find Book by `id: B001`
     const foundBook = await BookModel.findOne({ id: book });
@@ -32,6 +40,9 @@ export const IssueBook = async (
       book: foundBook.id,
       reader: foundReader.id,
       dueDate,
+      status: status || "pending", // Default to "pending" if not provided
+      readerName: readerName || foundReader.name,
+      bookTitle: bookTitle || foundBook.title,
     });
 
     await issue.save();
@@ -49,6 +60,23 @@ export const IssueBook = async (
   }
 };
 
+export const getIssueBooks = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const isBook = await IssueBookModel.find();
+
+    if (!isBook || isBook.length === 0) {
+      throw new ApiError(404, "No IssuedBooks found !!!");
+    }
+    res.status(200).json(isBook);
+  } catch (error: any) {
+    next(error);
+  }
+};
+
 //return book
 
 export const returnBook = async (
@@ -59,21 +87,82 @@ export const returnBook = async (
   try {
     const { id } = req.params;
 
+    // 1. Find the book by its custom ID (like B001)
     const returnToBeBook = await BookModel.findOne({ id });
 
     if (!returnToBeBook) {
-      throw new ApiError(404, "Book not found to return ");
+      throw new ApiError(404, "Book not found to return");
     }
 
     if (returnToBeBook.status === "Available") {
-      return res.status(400).json({ message: "Book already Returned" });
+      return res.status(400).json({ message: "Book already returned" });
     }
 
+    // 2. Update book status to Available
     returnToBeBook.status = "Available";
     await returnToBeBook.save();
+
+    // 3. Find latest pending issue record for this book
+    const latestIssue = await IssueBookModel.findOne({
+      book: id,
+      status: { $in: ["pending", "overdue"] },
+    }).sort({ createdAt: -1 });
+
+    if (latestIssue) {
+      latestIssue.status = "returned"; // or "delivered"
+      await latestIssue.save();
+    }
+
+    return res.status(200).json({
+      message: "Book returned successfully",
+      book: returnToBeBook,
+      updatedIssue: latestIssue || "No pending issue record found",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getOverdueReaders = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const today = new Date();
+
+    // Find all overdue issue records
+    const overdueIssues = await IssueBookModel.find({
+      dueDate: { $lt: today },
+      status: "pending",
+    });
+
+    if (overdueIssues.length === 0) {
+      return res.status(404).json({ message: "No overdue readers found" });
+    }
+
+    res.status(200).json(overdueIssues);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateOverdueStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+
+    const response = await IssueBookModel.findOneAndUpdate(
+      { id },
+      { status: "overdue" },
+      { new: true, runValidators: true }
+    );
     return res
       .status(200)
-      .json({ message: "book return successfully", returnToBeBook });
+      .json({ message: "Overdue status updated successfully" });
   } catch (error) {
     next(error);
   }

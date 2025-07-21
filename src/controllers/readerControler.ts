@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import ReaderModel from "../models/reader";
 import { ApiError } from "../errors/apiError";
 import mongoose from "mongoose";
+import BookModel from "../models/book";
 
 // create reader
 export const createReader = async (
@@ -97,3 +98,26 @@ export const getReaderById = async (
     next(error);
   }
 };
+
+// export const getBorrowedBookByReader = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//     const reader = await ReaderModel.findOne({ id: req.params.id });
+
+//     if (!reader) {
+//       throw new ApiError(404, "Reader not found");
+//     }
+
+//     if (!reader.borrowedBooks || reader.borrowedBooks.length === 0) {
+//       return res.status(200).json([]);
+//     }
+//     const book = await BookModel.find({ id: { $in: reader.borrowedBooks } });
+
+//     return res.status(200).json(book);
+//   } catch (error: any) {
+//     next(error);
+//   }
+// };

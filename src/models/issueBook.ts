@@ -5,17 +5,20 @@ type IssueBook  = {
     id : string , 
     reader : string , 
     book : string,
+    readerName?: string, // Optional field to store reader's name
+    bookTitle?: string, // Optional field to store book title
     lendingDate : Date , 
-    dueDate : Date
+    dueDate : Date,
+    status? :string
 
 }
 
 
 const issueBook = new mongoose.Schema<IssueBook>(
   {
-    id : {
-        type :String,
-        unique : true
+    id: {
+      type: String,
+      unique: true,
     },
     book: {
       type: String,
@@ -27,6 +30,16 @@ const issueBook = new mongoose.Schema<IssueBook>(
       ref: "Reader",
       required: true,
     },
+    readerName: {
+      type: String,
+      ref: "Reader",
+      required: false, // Optional field
+    },
+    bookTitle: {
+      type: String,
+      ref: "Book",
+      required: false, // Optional field
+    },
     lendingDate: {
       type: Date,
       default: Date.now,
@@ -34,6 +47,10 @@ const issueBook = new mongoose.Schema<IssueBook>(
     dueDate: {
       type: Date,
       required: true,
+    },
+    status: {
+      type: String,
+      default: "pending", // ✅ Default status set here
     },
   },
   { timestamps: true }
