@@ -9,7 +9,7 @@ type Book = {
   publisher: string;
   publishDate: Date;
   category: string;
-  status: "Available" | "Borrowed";
+  status: "Available" | "Issued";
 };
 
 const book = new mongoose.Schema<Book>(
@@ -58,7 +58,7 @@ const book = new mongoose.Schema<Book>(
     },
     status: {
       type: String,
-      enum: ["Available", "Borrowed"],
+      enum: ["Available", "Issued"],
       default: "Available",
     },
   },

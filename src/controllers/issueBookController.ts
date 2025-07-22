@@ -25,8 +25,8 @@ export const IssueBook = async (
     if (!foundBook) {
       return res.status(404).json({ message: "Book not found" });
     }
-    if (foundBook.status === "Borrowed") {
-      return res.status(400).json({ message: "Book already borrowed" });
+    if (foundBook.status === "Issued") {
+      return res.status(400).json({ message: "Book already issued" });
     }
 
     // Find Reader by
@@ -42,13 +42,14 @@ export const IssueBook = async (
       dueDate,
       status: status || "pending", // Default to "pending" if not provided
       readerName: readerName || foundReader.name,
+      readerEmail: foundReader.email,
       bookTitle: bookTitle || foundBook.title,
     });
 
     await issue.save();
 
     //  Update book status
-    foundBook.status = "Borrowed";
+    foundBook.status = "Issued";
     await foundBook.save();
 
     res.status(201).json({

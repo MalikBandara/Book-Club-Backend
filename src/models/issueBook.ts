@@ -7,6 +7,7 @@ type IssueBook  = {
     book : string,
     readerName?: string, // Optional field to store reader's name
     bookTitle?: string, // Optional field to store book title
+    readerEmail?: string, // Optional field to store reader's email
     lendingDate : Date , 
     dueDate : Date,
     status? :string
@@ -31,6 +32,11 @@ const issueBook = new mongoose.Schema<IssueBook>(
       required: true,
     },
     readerName: {
+      type: String,
+      ref: "Reader",
+      required: false, // Optional field
+    },
+    readerEmail: {
       type: String,
       ref: "Reader",
       required: false, // Optional field

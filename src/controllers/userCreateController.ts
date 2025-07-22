@@ -39,8 +39,10 @@ export const signup = async (
     if (existingUser) {
       return next(new ApiError(409, "Email already in use"));
     }
-
+    // hash the password 10 times 
     const saltRounds = 10;
+
+    // Generate a salt and hash the password and we use hash for production level 
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const user = new User({ name, email, password: hashedPassword });
