@@ -13,13 +13,16 @@ export const authenticateToken = (
   next: NextFunction
 ) => {
   try {
+    // req ekak enakota metanata enne dn header eken token eka gannava 
     const authHeader = req.headers["authorization"];
+    // bearer kiyn word eka ain krnv 
     const token = authHeader && authHeader.split(" ")[1]; // Expect "Bearer TOKEN"
 
     if (!token) {
       return next(new ApiError(401, "Access token missing"));
     }
 
+    // decrypt the token and verify details
     jwt.verify(
       token,
       process.env.ACCESS_TOKEN_SECRET as string,

@@ -99,30 +99,45 @@ export const returnBook = async (
       return res.status(400).json({ message: "Book already returned" });
     }
 
-    // 2. Update book status to Available
-    returnToBeBook.status = "Available";
-    await returnToBeBook.save();
-
-    // 3. Find latest pending issue record for this book
+    // 2. Find the latest issue record for this book
     const latestIssue = await IssueBookModel.findOne({
       book: id,
       status: { $in: ["pending", "overdue"] },
     }).sort({ createdAt: -1 });
 
-    if (latestIssue) {
-      latestIssue.status = "returned"; // or "delivered"
-      await latestIssue.save();
+    if (!latestIssue) {
+      return res.status(404).json({ message: "No active issue record found" });
     }
+
+    // 3. Check if the book is overdue based on dueDate
+    const today = new Date();
+    const dueDate = new Date(latestIssue.dueDate);
+
+    if (dueDate < today && latestIssue.status === "pending") {
+      return res.status(400).json({
+        message:
+          "This book is overdue.",
+      });
+    }
+
+    // 4. Update book status to Available
+    returnToBeBook.status = "Available";
+    await returnToBeBook.save();
+
+    // 5. Mark the issue record as returned
+    latestIssue.status = "returned";
+    await latestIssue.save();
 
     return res.status(200).json({
       message: "Book returned successfully",
       book: returnToBeBook,
-      updatedIssue: latestIssue || "No pending issue record found",
+      updatedIssue: latestIssue,
     });
   } catch (error) {
     next(error);
   }
 };
+
 
 export const getOverdueReaders = async (
   req: Request,
