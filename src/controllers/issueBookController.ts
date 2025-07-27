@@ -12,13 +12,13 @@ export const IssueBook = async (
   try {
     const { book, reader, bookTitle, readerName, dueDate, status } = req.body;
 
-    // const currentDate = new Date();
-    // const parsedDueDate = new Date(dueDate);
-    // if (parsedDueDate <= currentDate) {
-    //   return res.status(400).json({
-    //     message: "Due date must be after the issue (current) date",
-    //   });
-    // }
+    const currentDate = new Date();
+    const parsedDueDate = new Date(dueDate);
+    if (parsedDueDate <= currentDate) {
+      return res.status(400).json({
+        message: "Due date must be after the issue (current) date",
+      });
+    }
 
     //  Find Book by `id: B001`
     const foundBook = await BookModel.findOne({ id: book });
